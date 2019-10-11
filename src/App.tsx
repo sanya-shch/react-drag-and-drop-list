@@ -1,26 +1,44 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import { DragDropContext } from "react-beautiful-dnd";
 
-const App: React.FC = () => {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+import { reorderColors } from "./reorder";
+import { ColorMap } from "./types";
+
+import { ColorList } from "./ColorList";
+
+const App = () => {
+    const [colorMap, setColors] = useState<ColorMap>({
+        a: ["red", "green", "blue"],
+        b: ["black", "white"],
+        c: ["magenta", "yellow"],
+        d: ["gray", "orange"],
+        e: ["purple", "brown"]
+    });
+
+    return (
+        <DragDropContext
+            onDragEnd={({ destination, source }) => {
+                if (!destination) {
+                    return;
+                }
+                setColors(reorderColors(colorMap, source, destination));
+            }}
         >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+            <div>
+                {
+                    Object.entries(colorMap).map(([k, v]) => (
+                        <ColorList
+                            internalScroll
+                            key={k}
+                            listId={k}
+                            listType="CARD"
+                            colors={v}
+                        />
+                    ))
+                }
+            </div>
+        </DragDropContext>
+    );
+};
 
 export default App;
